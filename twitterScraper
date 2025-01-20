@@ -1,0 +1,21 @@
+import tweepy
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
+client = tweepy.Client(bearer_token=BEARER_TOKEN)
+
+# Look up user by username
+user = client.get_user(username="WesternWeightRm")
+user_id = user.data.id
+
+# Fetch the user’s tweets
+response = client.get_users_tweets(id=user_id, max_results=1, tweet_fields=["created_at", "text"])
+
+print("Latest Tweets:")
+if response.data:
+    for tweet in response.data:
+        print(f"- {tweet.created_at}: {tweet.text}")
