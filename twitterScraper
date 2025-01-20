@@ -1,21 +1,42 @@
 import tweepy
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv()
 
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
-
 client = tweepy.Client(bearer_token=BEARER_TOKEN)
 
-# Look up user by username
-user = client.get_user(username="WesternWeightRm")
-user_id = user.data.id
+def get_user_tweets_with_retry(username, max_results=5):
+    """Fetches the latest tweets for a given username,
+    retrying if a rate limit (429) error occurs."""
+    try:
+        # Look up the user by username
+        user = client.get_user(username=username)
+        user_id = user.data.id
+        
+        # Fetch the user’s tweets
+        response = client.get_users_tweets(
+            id=user_id,
+            max_results=max_results,
+            tweet_fields=["created_at", "text"]
+        )
+        return response
+    except tweepy.errors.TooManyRequests:
+        print("Hit the rate limit. Waiting 15 minutes before retrying...")
+        time.sleep(15 * 60)  # 15 minutes = 900 seconds
+        # Retry once after waiting
+        return get_user_tweets_with_retry(username, max_results)
 
-# Fetch the user’s tweets
-response = client.get_users_tweets(id=user_id, max_results=1, tweet_fields=["created_at", "text"])
-
-print("Latest Tweets:")
-if response.data:
-    for tweet in response.data:
-        print(f"- {tweet.created_at}: {tweet.text}")
+if __name__ == "__main__":
+    username_to_lookup = "WesternWeightRm"
+    
+    response = get_user_tweets_with_retry(username_to_lookup, max_results=5)
+    
+    print("Latest Tweets:")
+    if response and response.data:
+        for tweet in response.data:
+            print(f"- {tweet.created_at}: {tweet.text}")
+    else:
+        print(f"No tweets found for @{username_to_lookup}.")
