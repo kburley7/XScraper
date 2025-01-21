@@ -1,0 +1,10 @@
+/* Style for the purple top bar */
+#top-bar {
+    background-color: #5B2C6F;  /* Purple color (adjust as desired) */
+    color: white;               /* Text color */
+    padding: 20px;             /* Spacing inside the bar */
+    text-align: center;        /* Center the text */
+    font-family: Arial, sans-serif;
+    font-size: 1.2em;          /* Increase text size slightly */
+  }
+  
