@@ -7,4 +7,8 @@
     font-family: Arial, sans-serif;
     font-size: 1.2em;          /* Increase text size slightly */
   }
-  
+
+  #myChart {
+    width: 100%;
+  height: 500px;
+  }
